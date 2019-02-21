@@ -2,27 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Text;
 
     public abstract class TableWriter<T>
     {
         private readonly TextWriter writer;
+        private Dictionary<Column<T>, int> columnBaseWidthDictionary;
+        private Dictionary<Column<T>, int> columnPaddedWidthDictionary;
 
-        private int[] columnBaseWidthDictionary;
-        private int[] columnPaddedWidthDictionary;
-
-        private int tableTotalWidth;
-        private string contentFormatString;
-
-        public TableWriter(TextWriter writer)
+        protected TableWriter(TextWriter writer)
         {
             this.writer = writer;
         }
 
-        protected int TableTotalWidth { get => this.tableTotalWidth; }
+        protected int TableTotalWidth { get; private set; }
 
         public void Draw(Table<T> table, IEnumerable<T> items)
         {
@@ -33,46 +27,54 @@
         {
             this.Initialize(table, items, config);
 
-            this.DrawHeaderTop(table, config);
+            this.PostInitialize();
 
-            this.DrawRow(table.Columns.Select(col => col.Header).ToArray());
+            this.DrawTop(table, config);
 
-            this.DrawHeaderBottom(table, config);
+            this.DrawHeader(table, config);
 
             foreach (var item in items)
             {
-                this.DrawRow(table.Columns.Select(col => col.ValueSelector(item)).ToArray());
+                this.DrawContentRow(table, item, config);
             }
 
-            this.DrawFooter(table, config);
+            this.DrawBottom(table, config);
         }
 
-        public virtual void PostInitialize()
+        protected virtual void PostInitialize()
         {
+        }
+
+        private void DrawHeader(Table<T> table, TableConfig config)
+        {
+            this.writer.Write(config.VerticalCharacter);
+
+            foreach (var column in table.Columns)
+            {
+                this.WriteColumnCell(column, column.Header, config);
+                this.writer.Write(config.VerticalCharacter);
+            }
+
+            this.writer.Write(Environment.NewLine);
+
+            this.DrawHorizontalDivider(table, config);
         }
 
         private void Initialize(Table<T> table, IEnumerable<T> items, TableConfig config)
         {
-            this.columnBaseWidthDictionary = table.Columns.Select(
-                col => this.ComputeColumnBaseWidth(col, items))
-                .ToArray();
-
-            this.columnPaddedWidthDictionary = this.columnPaddedWidthDictionary.Select(
-                    width => width + config.CellLeftPadding + config.CellRightPadding)
-                    .ToArray();
-
-            this.tableTotalWidth = this.columnPaddedWidthDictionary.Sum() + table.Columns.Count + 1;
-
-            this.contentFormatString = this.BuildContentFormatString(table, config);
+            this.columnBaseWidthDictionary = table.Columns.ToDictionary(c => c, sel => this.ComputeColumnBaseWidth(sel, items));
+            this.columnPaddedWidthDictionary = this.columnBaseWidthDictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value + config.CellLeftPadding + config.CellRightPadding);
+            this.TableTotalWidth = this.columnPaddedWidthDictionary.Values.Sum() + table.Columns.Count + 1;
         }
 
-        private void DrawHeaderTop(Table<T> table, TableConfig config)
+        private void DrawTop(Table<T> table, TableConfig config)
         {
             this.writer.Write(config.TopLeftCharacter);
 
             for (int i = 0; i < table.Columns.Count; i++)
             {
-                this.writer.Write(new string(config.HorizontalCharacter, this.columnPaddedWidthDictionary[i]));
+                var column = table.Columns[i];
+                this.WriteColumnCell(column, config.HorizontalCharacter);
 
                 if (i + 1 != table.Columns.Count)
                 {
@@ -84,13 +86,14 @@
             this.writer.Write(Environment.NewLine);
         }
 
-        private void DrawHeaderBottom(Table<T> table, TableConfig config)
+        private void DrawHorizontalDivider(Table<T> table, TableConfig config)
         {
             this.writer.Write(config.VerticalLeftJointCharacter);
 
             for (int i = 0; i < table.Columns.Count; i++)
             {
-                this.writer.Write(new string(config.HorizontalCharacter, this.columnPaddedWidthDictionary[i]));
+                var column = table.Columns[i];
+                this.WriteColumnCell(column, config.HorizontalCharacter);
 
                 if (i + 1 != table.Columns.Count)
                 {
@@ -102,13 +105,14 @@
             this.writer.Write(Environment.NewLine);
         }
 
-        private void DrawFooter(Table<T> table, TableConfig config)
+        private void DrawBottom(Table<T> table, TableConfig config)
         {
             this.writer.Write(config.BottomLeftCharacter);
 
             for (int i = 0; i < table.Columns.Count; i++)
             {
-                this.writer.Write(new string(config.HorizontalCharacter, this.columnPaddedWidthDictionary[i]));
+                var column = table.Columns[i];
+                this.WriteColumnCell(column, config.HorizontalCharacter);
 
                 if (i + 1 != table.Columns.Count)
                 {
@@ -120,29 +124,34 @@
             this.writer.Write(Environment.NewLine);
         }
 
-        private void DrawRow(params string[] args)
+        private void WriteColumnCell(Column<T> column, char character)
         {
-            this.writer.Write(string.Format(CultureInfo.InvariantCulture, this.contentFormatString, args));
+            this.writer.Write(new string(character, this.columnPaddedWidthDictionary[column]));
         }
 
-        private string BuildContentFormatString(Table<T> table, TableConfig config)
+        private void WriteColumnCell(Column<T> column, string cellValue, TableConfig config)
         {
-            StringBuilder sb = new StringBuilder();
+            this.writer.Write(new string(' ', config.CellLeftPadding));
 
-            for (int i = 0; i < table.Columns.Count; i++)
+            var paddedCellValue = cellValue.PadLeft(this.columnBaseWidthDictionary[column]);
+
+            this.writer.Write(paddedCellValue);
+
+            this.writer.Write(new string(' ', config.CellRightPadding));
+        }
+
+        private void DrawContentRow(Table<T> table, T item, TableConfig config)
+        {
+            this.writer.Write(config.VerticalCharacter);
+
+            foreach (var column in table.Columns)
             {
-                sb.Append(config.VerticalCharacter);
-                sb.Append(new string(' ', config.CellLeftPadding));
-                sb.Append("{");
-                sb.Append(i);
-                sb.Append(',');
-                sb.Append((table.Columns[i].Width + config.CellRightPadding) * -1);
-                sb.Append('}');
+                var cellValue = column.ValueSelector(item);
+                this.WriteColumnCell(column, cellValue, config);
+                this.writer.Write(config.VerticalCharacter);
             }
 
-            sb.Append(config.VerticalCharacter);
-
-            return sb.ToString();
+            this.writer.Write(Environment.NewLine);
         }
 
         private int ComputeColumnBaseWidth(Column<T> column, IEnumerable<T> items)

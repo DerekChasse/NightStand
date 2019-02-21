@@ -26,7 +26,7 @@
 
         public int ConsoleResizePadding { get; set; } = 5;
 
-        public override void PostInitialize()
+        protected override void PostInitialize()
         {
             base.PostInitialize();
 

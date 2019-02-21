@@ -1,6 +1,5 @@
 ﻿namespace NightStand
 {
-    using System;
     using System.Collections.Generic;
 
     public class Table<T>
@@ -10,6 +9,6 @@
             this.Columns = new List<Column<T>>();
         }
 
-        public IList<Column<T>> Columns { get; private set; }
+        public IList<Column<T>> Columns { get; }
     }
 }
