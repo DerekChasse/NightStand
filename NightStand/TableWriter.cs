@@ -76,7 +76,7 @@
 
             foreach (var column in table.Columns)
             {
-                var paddedCellValue = this.PadCellValue(column.Header, this.columnBaseWidthDictionary[column]);
+                var paddedCellValue = this.PadCellValue(column.Header, column.Alignment, this.columnBaseWidthDictionary[column]);
 
                 this.DrawTableCellPadding(config.CellLeftPadding);
                 this.DrawTableCellContent(paddedCellValue);
@@ -132,7 +132,7 @@
 
             foreach (var column in table.Columns)
             {
-                var paddedCellValue = this.PadCellValue(column.ValueSelector(item), this.columnBaseWidthDictionary[column]);
+                var paddedCellValue = this.PadCellValue(column.ValueSelector(item), column.Alignment, this.columnBaseWidthDictionary[column]);
 
                 this.DrawTableCellPadding(config.CellLeftPadding);
                 this.DrawTableCellContent(paddedCellValue);
@@ -156,9 +156,9 @@
             return baseWidth;
         }
 
-        private string PadCellValue(string content, int totalWidth)
+        private string PadCellValue(string content, ColumnAlignment alignment, int totalWidth)
         {
-            return content.PadLeft(totalWidth);
+            return alignment == ColumnAlignment.Left ? content.PadRight(totalWidth) : content.PadLeft(totalWidth);
         }
 
         private void DrawNewLine()
