@@ -5,7 +5,7 @@
     public class Column<T>
     {
         public Column(string header, Func<T, string> valueSelector)
-            : this(header, ColumnAlignment.Right, valueSelector)
+            : this(header, ColumnAlignment.Left, valueSelector)
         {
         }
 
