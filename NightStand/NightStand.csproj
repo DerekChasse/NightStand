@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Derek Chasse</Authors>
+    <Company />
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <Copyright>Derek Chasse</Copyright>
+    <PackageProjectUrl>https://github.com/DerekChasse/NightStand</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DerekChasse/NightStand</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
