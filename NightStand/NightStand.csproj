@@ -11,6 +11,7 @@
     <PackageProjectUrl>https://github.com/DerekChasse/NightStand</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DerekChasse/NightStand</RepositoryUrl>
     <NoWarn>SA1633, SA1652</NoWarn>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
