@@ -1,3 +1,4 @@
+[![Build Status](https://derhasse.visualstudio.com/NightStand/_apis/build/status/Build%20and%20Package%20Master?branchName=master)](https://derhasse.visualstudio.com/NightStand/_build/latest?definitionId=42&branchName=master)
 # NightStand
 Tabular data pretty-printer in the console.
 
