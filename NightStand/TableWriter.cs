@@ -4,12 +4,15 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
 
     public abstract class TableWriter<T>
     {
         private readonly TextWriter writer;
-        private Dictionary<Column<T>, int> columnBaseWidthDictionary;
-        private Dictionary<Column<T>, int> columnPaddedWidthDictionary;
+
+        private Dictionary<Column<T>, int> columnWidthMap;
+        private string horizontalLine = string.Empty;
+        private string contentLine = string.Empty;
 
         protected TableWriter(TextWriter writer)
         {
@@ -29,16 +32,16 @@
 
             this.PostInitialize();
 
-            this.DrawTableTop(table, config);
+            this.DrawTableTop(config);
 
             this.DrawTableHeader(table, config);
 
             foreach (var item in items)
             {
-                this.DrawContentRow(table, item, config);
+                this.DrawContentRow(table, item);
             }
 
-            this.DrawTableBottom(table, config);
+            this.DrawTableBottom(config);
         }
 
         protected virtual void PostInitialize()
@@ -47,101 +50,70 @@
 
         private void Initialize(Table<T> table, IEnumerable<T> items, TableConfig config)
         {
-            this.columnBaseWidthDictionary = table.Columns.ToDictionary(c => c, sel => this.ComputeColumnBaseWidth(sel, items));
-            this.columnPaddedWidthDictionary = this.columnBaseWidthDictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value + config.CellLeftPadding + config.CellRightPadding);
-            this.TableTotalWidth = this.columnPaddedWidthDictionary.Values.Sum() + table.Columns.Count + 1;
-        }
+            this.columnWidthMap = table.Columns.ToDictionary(c => c, sel => this.ComputeColumnBaseWidth(sel, items));
+            var columnPaddedWidthDictionary = this.columnWidthMap.ToDictionary(kvp => kvp.Key, kvp => kvp.Value + config.CellLeftPadding + config.CellRightPadding);
+            this.TableTotalWidth = columnPaddedWidthDictionary.Values.Sum() + table.Columns.Count + 1;
 
-        private void DrawTableTop(Table<T> table, TableConfig config)
-        {
-            this.DrawTableBorderPortion(config.TopLeftCharacter);
-
+            var horizontalLineBuilder = new StringBuilder();
+            horizontalLineBuilder.Append("{0}");
             for (int i = 0; i < table.Columns.Count; i++)
             {
-                this.DrawTableBorderPortion(config.HorizontalCharacter, this.columnPaddedWidthDictionary[table.Columns[i]]);
+                var column = table.Columns[i];
+                horizontalLineBuilder.Append(config.HorizontalCharacter, columnPaddedWidthDictionary[column]);
 
                 if (i + 1 != table.Columns.Count)
                 {
-                    this.DrawTableBorderPortion(config.HorizontalTopJointCharacter);
+                    horizontalLineBuilder.Append("{1}");
                 }
             }
 
-            this.DrawTableBorderPortion(config.TopRightCharacter);
-            this.DrawNewLine();
+            horizontalLineBuilder.Append("{2}");
+            this.horizontalLine = horizontalLineBuilder.ToString();
+
+            var contentLineBuilder = new StringBuilder();
+
+            contentLineBuilder.Append(config.VerticalCharacter);
+
+            for (int i = 0; i < table.Columns.Count; i++)
+            {
+                contentLineBuilder.Append(' ', config.CellLeftPadding);
+                contentLineBuilder.Append('{').Append(i).Append('}');
+                contentLineBuilder.Append(' ', config.CellRightPadding);
+                contentLineBuilder.Append(config.VerticalCharacter);
+            }
+
+            this.contentLine = contentLineBuilder.ToString();
+        }
+
+        private void DrawTableTop(TableConfig config)
+        {
+            this.writer.WriteLine(string.Format(this.horizontalLine, config.TopLeftCharacter, config.HorizontalTopJointCharacter, config.TopRightCharacter));
         }
 
         private void DrawTableHeader(Table<T> table, TableConfig config)
         {
-            this.DrawTableBorderPortion(config.VerticalCharacter);
+            var values = table.Columns.Select(c => this.PadCellValue(c.Header, c.Alignment, this.columnWidthMap[c])).ToArray();
 
-            foreach (var column in table.Columns)
-            {
-                var paddedCellValue = this.PadCellValue(column.Header, column.Alignment, this.columnBaseWidthDictionary[column]);
+            this.writer.WriteLine(this.contentLine, values);
 
-                this.DrawTableCellPadding(config.CellLeftPadding);
-                this.DrawTableCellContent(paddedCellValue);
-                this.DrawTableCellPadding(config.CellRightPadding);
-
-                this.DrawTableBorderPortion(config.VerticalCharacter);
-            }
-
-            this.DrawNewLine();
-
-            this.DrawHorizontalDivider(table, config);
+            this.DrawHorizontalDivider(config);
         }
 
-        private void DrawHorizontalDivider(Table<T> table, TableConfig config)
+        private void DrawHorizontalDivider(TableConfig config)
         {
-            this.DrawTableBorderPortion(config.VerticalLeftJointCharacter);
-
-            for (int i = 0; i < table.Columns.Count; i++)
-            {
-                this.DrawTableBorderPortion(config.HorizontalCharacter, this.columnPaddedWidthDictionary[table.Columns[i]]);
-
-                if (i + 1 != table.Columns.Count)
-                {
-                    this.DrawTableBorderPortion(config.IntersectionJointCharacter);
-                }
-            }
-
-            this.DrawTableBorderPortion(config.VerticalRightJointCharacter);
-            this.DrawNewLine();
+            this.writer.WriteLine(string.Format(this.horizontalLine, config.VerticalLeftJointCharacter, config.IntersectionJointCharacter, config.VerticalRightJointCharacter));
         }
 
-        private void DrawTableBottom(Table<T> table, TableConfig config)
+        private void DrawTableBottom(TableConfig config)
         {
-            this.DrawTableBorderPortion(config.BottomLeftCharacter);
-
-            for (int i = 0; i < table.Columns.Count; i++)
-            {
-                this.DrawTableBorderPortion(config.HorizontalCharacter, this.columnPaddedWidthDictionary[table.Columns[i]]);
-
-                if (i + 1 != table.Columns.Count)
-                {
-                    this.DrawTableBorderPortion(config.HorizontalBottomJointCharacter);
-                }
-            }
-
-            this.DrawTableBorderPortion(config.BottomRightCharacter);
-            this.DrawNewLine();
+            this.writer.WriteLine(string.Format(this.horizontalLine, config.BottomLeftCharacter, config.HorizontalBottomJointCharacter, config.BottomRightCharacter));
         }
 
-        private void DrawContentRow(Table<T> table, T item, TableConfig config)
+        private void DrawContentRow(Table<T> table, T item)
         {
-            this.DrawTableBorderPortion(config.VerticalCharacter);
+            var values = table.Columns.Select(c => this.PadCellValue(c.ValueSelector(item), c.Alignment, this.columnWidthMap[c])).ToArray();
 
-            foreach (var column in table.Columns)
-            {
-                var paddedCellValue = this.PadCellValue(column.ValueSelector(item), column.Alignment, this.columnBaseWidthDictionary[column]);
-
-                this.DrawTableCellPadding(config.CellLeftPadding);
-                this.DrawTableCellContent(paddedCellValue);
-                this.DrawTableCellPadding(config.CellRightPadding);
-
-                this.DrawTableBorderPortion(config.VerticalCharacter);
-            }
-
-            this.DrawNewLine();
+            this.writer.WriteLine(this.contentLine, values);
         }
 
         private int ComputeColumnBaseWidth(Column<T> column, IEnumerable<T> items)
@@ -159,31 +131,6 @@
         private string PadCellValue(string content, ColumnAlignment alignment, int totalWidth)
         {
             return alignment == ColumnAlignment.Left ? content.PadRight(totalWidth) : content.PadLeft(totalWidth);
-        }
-
-        private void DrawNewLine()
-        {
-            this.writer.Write(Environment.NewLine);
-        }
-
-        private void DrawTableBorderPortion(char character)
-        {
-            this.writer.Write(character);
-        }
-
-        private void DrawTableBorderPortion(char character, int instances)
-        {
-            this.writer.Write(new string(character, instances));
-        }
-
-        private void DrawTableCellPadding(int instances)
-        {
-            this.writer.Write(new string(' ', instances));
-        }
-
-        private void DrawTableCellContent(string content)
-        {
-            this.writer.Write(content);
         }
     }
 }
