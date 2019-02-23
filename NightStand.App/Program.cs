@@ -45,7 +45,7 @@
                 samples.Add(new Person());
             }
 
-            new ConsoleTableWriter<Person>().Draw(table, samples);
+            samples.Draw(table);
         }
     }
 }

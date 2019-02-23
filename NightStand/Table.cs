@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public class Table<T>
+    public class Table<T> : ITable<T>
     {
         public Table()
         {
