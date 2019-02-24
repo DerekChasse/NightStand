@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Bogus;
+    using NightStand.Builder;
 
     public class Program
     {
@@ -24,11 +25,9 @@
 
         private static void Test()
         {
-            var rand = new Random();
+            var samples = new List<Person>();
 
-            List<Person> samples = new List<Person>();
-
-            Table<Person> table = new Table<Person>
+            var table = new Table<Person>
             {
                 Columns =
                 {
@@ -40,12 +39,41 @@
                 }
             };
 
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 samples.Add(new Person());
             }
 
-            samples.Draw(table);
+            table.Draw(samples);
+
+            Table<Person> fluentTable = new TableBuilder<Person>()
+                .AddColumn(
+                    new ColumnBuilder<Person>()
+                        .WithHeader("Full Name")
+                        .WithValueSelector(p => p.FullName)
+                        .RightAligned())
+                .AddColumn(
+                    new ColumnBuilder<Person>()
+                        .WithHeader("Gender")
+                        .WithValueSelector(p => p.Gender.ToString())
+                        .RightAligned())
+                .AddColumn(
+                    new ColumnBuilder<Person>()
+                        .WithHeader("Birth Date")
+                        .WithValueSelector(p => p.DateOfBirth.ToShortDateString())
+                        .RightAligned())
+                .AddColumn(
+                    new ColumnBuilder<Person>()
+                        .WithHeader("City")
+                        .WithValueSelector(p => p.Address.City)
+                        .RightAligned())
+                .AddColumn(
+                    new ColumnBuilder<Person>()
+                        .WithHeader("State")
+                        .WithValueSelector(p => p.Address.State)
+                        .RightAligned());
+
+            fluentTable.Draw(samples);
         }
     }
 }
