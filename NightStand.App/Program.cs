@@ -43,7 +43,7 @@
                 samples.Add(new Person());
             }
 
-            new ConsoleTableWriter<Person>().Draw(table, samples);
+            table.Draw(samples);
         }
     }
 }
