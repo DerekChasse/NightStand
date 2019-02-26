@@ -24,11 +24,9 @@
 
         private static void Test()
         {
-            var rand = new Random();
+            var samples = new List<Person>();
 
-            List<Person> samples = new List<Person>();
-
-            Table<Person> table = new Table<Person>
+            var table = new Table<Person>
             {
                 Columns =
                 {
@@ -40,7 +38,7 @@
                 }
             };
 
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 samples.Add(new Person());
             }
