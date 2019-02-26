@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Text;
 
-    public abstract class TableWriter<T>
+    public abstract class TextTableWriter<T> : TableWriter<T>
     {
         private readonly TextWriter writer;
 
@@ -14,19 +14,19 @@
         private string horizontalLine = string.Empty;
         private string contentLine = string.Empty;
 
-        protected TableWriter(TextWriter writer)
+        protected TextTableWriter(TextWriter writer)
         {
             this.writer = writer;
         }
 
         protected int TableTotalWidth { get; private set; }
 
-        public void Draw(Table<T> table, IEnumerable<T> items)
+        public override void Draw(Table<T> table, IEnumerable<T> items)
         {
             this.Draw(table, items, TableConfig.Default);
         }
 
-        public void Draw(Table<T> table, IEnumerable<T> items, TableConfig config)
+        public override void Draw(Table<T> table, IEnumerable<T> items, TableConfig config)
         {
             var enumerated = items as T[] ?? items.ToArray();
 
@@ -44,10 +44,6 @@
             }
 
             this.DrawTableBottom(config);
-        }
-
-        protected virtual void PostInitialize()
-        {
         }
 
         private static int ComputeColumnBaseWidth(Column<T> column, IEnumerable<T> items)

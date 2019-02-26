@@ -9,7 +9,7 @@
             new ConsoleTableWriter<T>().Draw(table, items);
         }
 
-        public static void DrawWith<T>(this IEnumerable<T> items, TableWriter<T> writer, Table<T> table)
+        public static void DrawWith<T>(this IEnumerable<T> items, ITableWriter<T> writer, Table<T> table)
         {
             writer.Draw(table, items);
         }
