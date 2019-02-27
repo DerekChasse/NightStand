@@ -1,4 +1,4 @@
-[![Build Status](https://derhasse.visualstudio.com/NightStand/_apis/build/status/Build%20and%20Package%20Master?branchName=master)](https://derhasse.visualstudio.com/NightStand/_build/latest?definitionId=42&branchName=master)
+[![Build Status](https://derhasse.visualstudio.com/NightStand/_apis/build/status/Build%20and%20Package%20Master?branchName=master)](https://derhasse.visualstudio.com/NightStand/_build/latest?definitionId=42&branchName=master) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DerekChasse_NightStand&metric=alert_status)](https://sonarcloud.io/dashboard?id=DerekChasse_NightStand)
 # NightStand
 Tabular data pretty-printer in the console.
 
