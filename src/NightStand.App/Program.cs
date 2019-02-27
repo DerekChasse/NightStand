@@ -15,7 +15,10 @@
                 Test();
 
                 Console.WriteLine();
+
                 Console.WriteLine("Press ENTER to run test again.");
+
+                Console.WriteLine();
 
                 exit = Console.ReadKey().Key == ConsoleKey.Enter;
             }
@@ -24,11 +27,9 @@
 
         private static void Test()
         {
-            var rand = new Random();
+            var people = new List<Person>();
 
-            List<Person> samples = new List<Person>();
-
-            Table<Person> table = new Table<Person>
+            var table = new Table<Person>
             {
                 Columns =
                 {
@@ -40,12 +41,12 @@
                 }
             };
 
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
-                samples.Add(new Person());
+                people.Add(new Person());
             }
 
-            new ConsoleTableWriter<Person>().Draw(table, samples);
+            table.Draw(people);
         }
     }
 }

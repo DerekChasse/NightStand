@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class ConsoleTableWriter<T> : TableWriter<T>
+    public class ConsoleTableWriter<T> : TextTableWriter<T>
     {
         public ConsoleTableWriter()
             : base(Console.Out)
