@@ -14,45 +14,41 @@ using NightStand;
 
 Then define your table.
 
-As an example lets imagine that we want to print some information derived from `CultureInfo` objects. The following is a simple example of how to do so.
+As an example lets imagine that we want to print some information derived from `Person` objects. The following is a simple example of how to do so.
+
 
 ```csharp
-Table<CultureInfo> cultureTable = new Table<CultureInfo>
+var table = new Table<Person>
 {
     Columns =
     {
-        new Column<CultureInfo>(header: "Name", valueSelector: ci => ci.Name),
-        new Column<CultureInfo>(header: "Display Name", valueSelector: ci => ci.DisplayName)
+        new Column<Person>("Full Name", s => s.FullName),
+        new Column<Person>("Gender", s => s.Gender.ToString()),
+        new Column<Person>("Birth Date", s => s.DateOfBirth.ToShortDateString()),
+        new Column<Person>("City", s => s.Address.City),
+        new Column<Person>("State", s => s.Address.State),
     }
 };
+
 ```
 
 Once defined that table can be passed to a `TableWriter` instance such as the `ConsoleTableWriter`.
 
 ```csharp
 // Some sample data
-IEnumerable<CultureInfo> cultures = CultureInfo.GetCultures(CultureTypes.AllCultures).Take(10);
+var people = new List<Person>();
 
-ConsoleTableWriter<CultureInfo> consoleWriter = new ConsoleTableWriter<CultureInfo>();
+// Generate person objects...
 
-consoleWriter.Draw(table: cultureTable, items: cultures);
+ConsoleTableWriter<Person> consoleWriter = new ConsoleTableWriter<Person>();
+
+consoleWriter.Draw(table: cultureTable, items: people);
 ```
 
 
-Sample output
-```
-┌────────┬────────────────────────────────────────┐
-│ Name   │ Display Name                           │
-├────────┼────────────────────────────────────────┤
-│        │ Invariant Language (Invariant Country) │
-│ aa     │ Qafar                                  │
-│ aa-DJ  │ Qafar (Yabuuti)                        │
-│ aa-ER  │ Qafar (Eretria)                        │
-│ aa-ET  │ Qafar (Otobbia)                        │
-│ af     │ Afrikaans                              │
-│ af-NA  │ Afrikaans (Namibië)                    │
-│ af-ZA  │ Afrikaans (South Africa)               │
-│ agq    │ Aghem                                  │
-│ agq-CM │ Aghem (Kàmàlû?)                        │
-└────────┴────────────────────────────────────────┘
-```
+### Sample output
+![](./doc/img/output.png)
+
+
+## More Info
+For more information, check the [documentation](./doc/index.md).
