@@ -40,20 +40,20 @@
 
             foreach (var item in enumerated)
             {
-                this.DrawContentRow(table, item);
+                this.DrawContentRow(table, item, config.NullCellDefaultValue);
             }
 
             this.DrawTableBottom(config);
         }
 
-        private static int ComputeColumnBaseWidth(Column<T> column, IEnumerable<T> items)
+        private static int ComputeColumnBaseWidth(Column<T> column, IEnumerable<T> items, string nullCellValue)
         {
             var baseWidth = column.Header.Length;
 
             var enumerated = items as T[] ?? items.ToArray();
             if (enumerated.Any())
             {
-                baseWidth = Math.Max(enumerated.Max(item => column.ValueSelector(item).Length), baseWidth);
+                baseWidth = Math.Max(enumerated.Max(item => (column.ValueSelector(item) ?? nullCellValue).Length), baseWidth);
             }
 
             return baseWidth;
@@ -66,7 +66,7 @@
 
         private void Initialize(Table<T> table, IEnumerable<T> items, TableConfig config)
         {
-            this.columnWidthMap = table.Columns.ToDictionary(c => c, sel => ComputeColumnBaseWidth(sel, items));
+            this.columnWidthMap = table.Columns.ToDictionary(c => c, sel => ComputeColumnBaseWidth(sel, items, config.NullCellDefaultValue));
             var columnPaddedWidthDictionary = this.columnWidthMap.ToDictionary(kvp => kvp.Key, kvp => kvp.Value + config.CellLeftPadding + config.CellRightPadding);
             this.TableTotalWidth = columnPaddedWidthDictionary.Values.Sum() + table.Columns.Count + 1;
 
@@ -125,9 +125,9 @@
             this.writer.WriteLine(this.horizontalLine, config.BottomLeftCharacter, config.HorizontalBottomJointCharacter, config.BottomRightCharacter);
         }
 
-        private void DrawContentRow(Table<T> table, T item)
+        private void DrawContentRow(Table<T> table, T item, string nullCellValue)
         {
-            var values = table.Columns.Select(c => PadCellValue(c.ValueSelector(item), c.Alignment, this.columnWidthMap[c])).ToArray();
+            var values = table.Columns.Select(c => PadCellValue(c.ValueSelector(item) ?? nullCellValue, c.Alignment, this.columnWidthMap[c])).ToArray();
 
             this.writer.WriteLine(this.contentLine, values);
         }
