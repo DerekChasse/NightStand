@@ -9,17 +9,18 @@
     public abstract class TextTableWriter<T> : TableWriter<T>
     {
         private readonly TextWriter writer;
+        private readonly StringBuilder builder;
 
-        private Dictionary<Column<T>, int> columnWidthMap;
-        private string horizontalLine = string.Empty;
-        private string contentLine = string.Empty;
+        private IDictionary<Column<T>, int> columnWidthLookup;
+        private IDictionary<Column<T>, int> paddedColumnWidthLookup;
 
         protected TextTableWriter(TextWriter writer)
         {
             this.writer = writer;
+            this.builder = new StringBuilder();
         }
 
-        protected int TableTotalWidth { get; private set; }
+        public int TableMaxWidth { get; private set; }
 
         public override void Draw(Table<T> table, IEnumerable<T> items)
         {
@@ -32,18 +33,45 @@
 
             this.Initialize(table, enumerated, config);
 
-            this.PostInitialize();
+            if (!string.IsNullOrEmpty(table.Title))
+            {
+                this.DrawTitle(table, config);
+            }
+            else
+            {
+                this.builder.Append(config.TopLeftCharacter);
 
-            this.DrawTableTop(config);
+                for (int i = 0; i < table.Columns.Count; i++)
+                {
+                    var column = table.Columns[i];
+                    this.builder.Append(config.HorizontalCharacter, this.paddedColumnWidthLookup[column]);
+                    this.builder.Append(i != table.Columns.Count - 1 ? config.HorizontalTopJointCharacter : config.TopRightCharacter);
+                }
 
-            this.DrawTableHeader(table, config);
+                this.builder.Append(Environment.NewLine);
+            }
+
+            this.DrawHeader(table, config);
 
             foreach (var item in enumerated)
             {
-                this.DrawContentRow(table, item, config.NullCellDefaultValue);
+                this.builder.Append(config.VerticalCharacter);
+
+                foreach (var column in table.Columns)
+                {
+                    var content = column.ValueSelector(item) ?? config.NullCellDefaultValue;
+
+                    this.DrawCell(content, this.columnWidthLookup[column], column.Alignment, config);
+
+                    this.builder.Append(config.VerticalCharacter);
+                }
+
+                this.builder.Append(Environment.NewLine);
             }
 
-            this.DrawTableBottom(config);
+            this.DrawFooter(table, config);
+
+            this.writer.WriteLine(this.builder);
         }
 
         private static int ComputeColumnBaseWidth(Column<T> column, IEnumerable<T> items, string nullCellValue)
@@ -59,77 +87,136 @@
             return baseWidth;
         }
 
-        private static string PadCellValue(string content, ColumnAlignment alignment, int totalWidth)
+        private void DrawFooter(Table<T> table, TableConfig config)
         {
-            return alignment == ColumnAlignment.Left ? content.PadRight(totalWidth) : content.PadLeft(totalWidth);
-        }
+            this.builder.Append(config.BottomLeftCharacter);
 
-        private void Initialize(Table<T> table, IEnumerable<T> items, TableConfig config)
-        {
-            this.columnWidthMap = table.Columns.ToDictionary(c => c, sel => ComputeColumnBaseWidth(sel, items, config.NullCellDefaultValue));
-            var columnPaddedWidthDictionary = this.columnWidthMap.ToDictionary(kvp => kvp.Key, kvp => kvp.Value + config.CellLeftPadding + config.CellRightPadding);
-            this.TableTotalWidth = columnPaddedWidthDictionary.Values.Sum() + table.Columns.Count + 1;
-
-            var horizontalLineBuilder = new StringBuilder();
-            horizontalLineBuilder.Append("{0}");
             for (int i = 0; i < table.Columns.Count; i++)
             {
                 var column = table.Columns[i];
-                horizontalLineBuilder.Append(config.HorizontalCharacter, columnPaddedWidthDictionary[column]);
 
-                if (i + 1 != table.Columns.Count)
-                {
-                    horizontalLineBuilder.Append("{1}");
-                }
+                this.builder.Append(config.HorizontalCharacter, this.paddedColumnWidthLookup[column]);
+
+                this.builder.Append(i != table.Columns.Count - 1 ? config.HorizontalBottomJointCharacter : config.BottomRightCharacter);
             }
 
-            horizontalLineBuilder.Append("{2}");
-            this.horizontalLine = horizontalLineBuilder.ToString();
+            this.builder.Append(Environment.NewLine);
+        }
 
-            var contentLineBuilder = new StringBuilder();
-
-            contentLineBuilder.Append(config.VerticalCharacter);
+        private void DrawHeader(Table<T> table, TableConfig config)
+        {
+            this.builder.Append(config.VerticalCharacter);
 
             for (int i = 0; i < table.Columns.Count; i++)
             {
-                contentLineBuilder.Append(' ', config.CellLeftPadding);
-                contentLineBuilder.Append('{').Append(i).Append('}');
-                contentLineBuilder.Append(' ', config.CellRightPadding);
-                contentLineBuilder.Append(config.VerticalCharacter);
+                var column = table.Columns[i];
+
+                this.DrawCell(column.Header, this.columnWidthLookup[column], column.Alignment, config);
+
+                this.builder.Append(config.VerticalCharacter);
             }
 
-            this.contentLine = contentLineBuilder.ToString();
+            this.builder.Append(Environment.NewLine);
+
+            this.builder.Append(config.VerticalLeftJointCharacter);
+
+            for (int i = 0; i < table.Columns.Count; i++)
+            {
+                var column = table.Columns[i];
+
+                this.builder.Append(config.HorizontalCharacter, this.paddedColumnWidthLookup[column]);
+
+                this.builder.Append(i != table.Columns.Count - 1 ? config.IntersectionJointCharacter : config.VerticalRightJointCharacter);
+            }
+
+            this.builder.Append(Environment.NewLine);
         }
 
-        private void DrawTableTop(TableConfig config)
+        private void DrawTitle(Table<T> table, TableConfig config)
         {
-            this.writer.WriteLine(this.horizontalLine, config.TopLeftCharacter, config.HorizontalTopJointCharacter, config.TopRightCharacter);
+            var leftPadding = (this.TableMaxWidth - 2 - table.Title.Length) / 2;
+            var rightPadding = this.TableMaxWidth - 2 - table.Title.Length - leftPadding;
+
+            this.builder.Append(config.TopLeftCharacter);
+            this.builder.Append(config.HorizontalCharacter, this.TableMaxWidth - 2);
+            this.builder.Append(config.TopRightCharacter);
+            this.builder.Append(Environment.NewLine);
+
+            this.builder.Append(config.VerticalCharacter);
+            this.builder.Append(' ', leftPadding);
+            this.builder.Append(table.Title);
+            this.builder.Append(' ', rightPadding);
+            this.builder.Append(config.VerticalCharacter);
+            this.builder.Append(Environment.NewLine);
+
+            this.builder.Append(config.VerticalLeftJointCharacter);
+
+            for (int i = 0; i < table.Columns.Count; i++)
+            {
+                var column = table.Columns[i];
+                this.builder.Append(config.HorizontalCharacter, this.paddedColumnWidthLookup[column]);
+                this.builder.Append(i != table.Columns.Count - 1 ? config.HorizontalTopJointCharacter : config.VerticalRightJointCharacter);
+            }
+
+            this.builder.Append(Environment.NewLine);
         }
 
-        private void DrawTableHeader(Table<T> table, TableConfig config)
+        private void Initialize(Table<T> table, T[] enumerated, TableConfig config)
         {
-            var values = table.Columns.Select(c => PadCellValue(c.Header, c.Alignment, this.columnWidthMap[c])).ToArray();
+            this.columnWidthLookup = table.Columns.ToDictionary(col => col, col => ComputeColumnBaseWidth(col, enumerated, config.NullCellDefaultValue));
 
-            this.writer.WriteLine(this.contentLine, values);
+            var contentLineWidth = this.columnWidthLookup.Values.Sum() + (table.Columns.Count * (config.CellLeftPadding + config.CellRightPadding)) + table.Columns.Count + 1;
+            var titleLineWidth = table.Title.Length + config.CellLeftPadding + config.CellRightPadding + 2;
 
-            this.DrawHorizontalDivider(config);
+            if (contentLineWidth < titleLineWidth)
+            {
+                var lastColumn = this.columnWidthLookup.Last();
+
+                var lastColumnWidth = lastColumn.Value + (titleLineWidth - contentLineWidth);
+
+                this.columnWidthLookup[lastColumn.Key] = lastColumnWidth;
+            }
+
+            this.paddedColumnWidthLookup = this.columnWidthLookup.ToDictionary(kvp => kvp.Key, kvp => kvp.Value + config.CellLeftPadding + config.CellRightPadding);
+
+            this.TableMaxWidth = Math.Max(contentLineWidth, titleLineWidth);
         }
 
-        private void DrawHorizontalDivider(TableConfig config)
+        private void DrawCell(string content, int totalWidth, ColumnAlignment alignment, TableConfig config)
         {
-            this.writer.WriteLine(this.horizontalLine, config.VerticalLeftJointCharacter, config.IntersectionJointCharacter, config.VerticalRightJointCharacter);
-        }
+            this.builder.Append(' ', config.CellLeftPadding);
 
-        private void DrawTableBottom(TableConfig config)
-        {
-            this.writer.WriteLine(this.horizontalLine, config.BottomLeftCharacter, config.HorizontalBottomJointCharacter, config.BottomRightCharacter);
-        }
+            switch (alignment)
+            {
+                case ColumnAlignment.Center:
+                    {
+                        var leftPadding = (totalWidth - content.Length) / 2;
+                        var rightPadding = totalWidth - content.Length - leftPadding;
 
-        private void DrawContentRow(Table<T> table, T item, string nullCellValue)
-        {
-            var values = table.Columns.Select(c => PadCellValue(c.ValueSelector(item) ?? nullCellValue, c.Alignment, this.columnWidthMap[c])).ToArray();
+                        this.builder.Append(' ', leftPadding);
+                        this.builder.Append(content);
+                        this.builder.Append(' ', rightPadding);
 
-            this.writer.WriteLine(this.contentLine, values);
+                        break;
+                    }
+
+                case ColumnAlignment.Left:
+                    {
+                        this.builder.Append(content.PadRight(totalWidth));
+                        break;
+                    }
+
+                case ColumnAlignment.Right:
+                    {
+                        this.builder.Append(content.PadLeft(totalWidth));
+                        break;
+                    }
+
+                default:
+                    break;
+            }
+
+            this.builder.Append(' ', config.CellRightPadding);
         }
     }
 }
