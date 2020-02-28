@@ -31,6 +31,7 @@
 
             var table = new Table<Person>
             {
+                Title = "These are people",
                 Columns =
                 {
                     new Column<Person>("Full Name", s => s.FullName),
@@ -41,7 +42,7 @@
                 }
             };
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 50; i++)
             {
                 people.Add(new Person());
             }
