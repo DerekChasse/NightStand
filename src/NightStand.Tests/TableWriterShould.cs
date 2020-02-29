@@ -1,4 +1,4 @@
-namespace NightStand.Tests
+﻿namespace NightStand.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -11,12 +11,6 @@ namespace NightStand.Tests
     [TestClass]
     public class TableWriterShould
     {
-        private readonly List<TestEntity> testData = new List<TestEntity>
-        {
-            new TestEntity { Id = 1, Value = "Short" },
-            new TestEntity { Id = 2, Value = "Loooooooooooong" }
-        };
-
         public StringWriter Writer { get; private set; }
 
         [TestInitialize]
@@ -29,6 +23,12 @@ namespace NightStand.Tests
         public void Draw_Success()
         {
             // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = "Short" },
+                new TestEntity { Id = 2, Value = "Loooooooooooong" },
+            };
+
             Table<TestEntity> table = new Table<TestEntity>
             {
                 Columns =
@@ -41,20 +41,26 @@ namespace NightStand.Tests
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
 
             // Act
-            testWriter.Draw(table, this.testData);
+            testWriter.Draw(table, testData);
 
             // Assert
             var result = this.Writer.ToString();
             result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
 
-            var lines = result.Split(Environment.NewLine);
-            lines.Length.Should().Be(7, "Draw should generate the correct number of lines.");
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(6, "Draw should generate the correct number of lines.");
         }
 
         [TestMethod]
-        public void Draw_DefaultTableConfig_CorrectCharacters()
+        public void Draw_DefaultTableConfig_Success()
         {
             // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = "Short" },
+                new TestEntity { Id = 2, Value = "Loooooooooooong" },
+            };
+
             Table<TestEntity> table = new Table<TestEntity>
             {
                 Columns =
@@ -67,52 +73,279 @@ namespace NightStand.Tests
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
 
             // Act
-            testWriter.Draw(table, this.testData);
+            testWriter.Draw(table, testData);
 
             // Assert
             var result = this.Writer.ToString();
             result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
 
-            var lines = result.Split(Environment.NewLine);
-            lines.Length.Should().Be(7, "Draw should generate the correct number of lines.");
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(6, "Draw should generate the correct number of lines.");
 
-            // Top Line
-            lines[0].Distinct().Should()
-                .Contain(TableConfig.Default.TopLeftCharacter, $"{TableConfig.Default.TopLeftCharacter} should be in the table top line.")
-                .And
-                .Contain(TableConfig.Default.HorizontalCharacter, $"{TableConfig.Default.HorizontalCharacter} should be in the table top line.")
-                .And
-                .Contain(TableConfig.Default.HorizontalTopJointCharacter, $"{TableConfig.Default.HorizontalTopJointCharacter} should be in the table top line with more than one column.")
-                .And
-                .Contain(TableConfig.Default.TopRightCharacter, $"{TableConfig.Default.TopRightCharacter} should be in the table top line.");
+            lines[0].Should().Be("┌────┬─────────────────┐");
+            lines[1].Should().Be("│ Id │ Value           │");
+            lines[2].Should().Be("├────┼─────────────────┤");
+            lines[3].Should().Be("│ 1  │ Short           │");
+            lines[4].Should().Be("│ 2  │ Loooooooooooong │");
+            lines[5].Should().Be("└────┴─────────────────┘");
+        }
 
-            // Header
-            lines[1].Distinct().Should()
-                .Contain(TableConfig.Default.VerticalCharacter, $"{TableConfig.Default.VerticalCharacter} should be in the table header");
+        [TestMethod]
+        public void Draw_CustomTableConfig_Success()
+        {
+            // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = "Short" },
+                new TestEntity { Id = 2, Value = "Loooooooooooong" },
+            };
 
-            // Divider
-            lines[2].Distinct().Should()
-                .Contain(TableConfig.Default.VerticalLeftJointCharacter, $"{TableConfig.Default.VerticalLeftJointCharacter} should be in the table divider.")
-                .And
-                .Contain(TableConfig.Default.HorizontalCharacter, $"{TableConfig.Default.HorizontalCharacter} should be in the table divider.")
-                .And
-                .Contain(TableConfig.Default.IntersectionJointCharacter, $"{TableConfig.Default.IntersectionJointCharacter} should be in the table divider with more than one column.")
-                .And
-                .Contain(TableConfig.Default.VerticalRightJointCharacter, $"{TableConfig.Default.VerticalRightJointCharacter} should be in the table divider.");
+            Table<TestEntity> table = new Table<TestEntity>
+            {
+                Columns =
+                {
+                    new Column<TestEntity>("Id", c => c.Id.ToString()),
+                    new Column<TestEntity>("Value", c => c.Value)
+                }
+            };
 
-            // Content
-            lines[3].Distinct().Should()
-                .Contain(TableConfig.Default.VerticalCharacter, $"{TableConfig.Default.VerticalCharacter} should be in the table content.");
+            TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
 
-            // Bottom Line
-            lines[5].Distinct().Should()
-                .Contain(TableConfig.Default.BottomLeftCharacter, $"{TableConfig.Default.BottomLeftCharacter} should be in the table bottom line.")
-                .And
-                .Contain(TableConfig.Default.HorizontalCharacter, $"{TableConfig.Default.HorizontalCharacter} should be in the table bottom line.")
-                .And
-                .Contain(TableConfig.Default.HorizontalBottomJointCharacter, $"{TableConfig.Default.HorizontalBottomJointCharacter} should be in the table bottom line with more than one column.")
-                .And
-                .Contain(TableConfig.Default.BottomRightCharacter, $"{TableConfig.Default.BottomRightCharacter} should be in the table bottom line.");
+            TableConfig customTableConfig = new TableConfig
+            {
+                BottomLeftCharacter = '#',
+                HorizontalBottomJointCharacter = '#',
+                BottomRightCharacter = '#',
+                HorizontalCharacter = '#',
+                HorizontalTopJointCharacter = '#',
+                IntersectionJointCharacter = '#',
+                TopLeftCharacter = '#',
+                TopRightCharacter = '#',
+                VerticalCharacter = '#',
+                VerticalLeftJointCharacter = '#',
+                VerticalRightJointCharacter = '#',
+            };
+
+            // Act
+            testWriter.Draw(table, testData, customTableConfig);
+
+            // Assert
+            var result = this.Writer.ToString();
+            result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(6, "Draw should generate the correct number of lines.");
+
+            lines[0].Should().Be("########################");
+            lines[1].Should().Be("# Id # Value           #");
+            lines[2].Should().Be("########################");
+            lines[3].Should().Be("# 1  # Short           #");
+            lines[4].Should().Be("# 2  # Loooooooooooong #");
+            lines[5].Should().Be("########################");
+        }
+
+        [TestMethod]
+        public void Draw_DefaultNullColumnValue_Success()
+        {
+            // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = null },
+            };
+
+            Table<TestEntity> table = new Table<TestEntity>
+            {
+                Columns =
+                {
+                    new Column<TestEntity>("Id", c => c.Id.ToString()),
+                    new Column<TestEntity>("Value", c => c.Value)
+                }
+            };
+
+            TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
+
+            // Act
+            testWriter.Draw(table, testData);
+
+            // Assert
+            var result = this.Writer.ToString();
+            result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(5, "Draw should generate the correct number of lines.");
+
+            lines[0].Should().Be("┌────┬───────┐");
+            lines[1].Should().Be("│ Id │ Value │");
+            lines[2].Should().Be("├────┼───────┤");
+            lines[3].Should().Be("│ 1  │       │");
+            lines[4].Should().Be("└────┴───────┘");
+        }
+
+        [TestMethod]
+        public void Draw_CustomNullColumnValue_Success()
+        {
+            // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = null },
+            };
+
+            Table<TestEntity> table = new Table<TestEntity>
+            {
+                Columns =
+                {
+                    new Column<TestEntity>("Id", c => c.Id.ToString()),
+                    new Column<TestEntity>("Value", c => c.Value)
+                }
+            };
+
+            TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
+
+            var customDataConfig = TableConfig.Default;
+            customDataConfig.NullCellDefaultValue = "n/a";
+
+            // Act
+            testWriter.Draw(table, testData, customDataConfig);
+
+            // Assert
+            var result = this.Writer.ToString();
+            result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(5, "Draw should generate the correct number of lines.");
+
+            lines[0].Should().Be("┌────┬───────┐");
+            lines[1].Should().Be("│ Id │ Value │");
+            lines[2].Should().Be("├────┼───────┤");
+            lines[3].Should().Be("│ 1  │ n/a   │");
+            lines[4].Should().Be("└────┴───────┘");
+        }
+
+        [TestMethod]
+        public void Draw_Title_Success()
+        {
+            // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = "Short" },
+                new TestEntity { Id = 2, Value = "Loooooooooooong" },
+            };
+
+            Table<TestEntity> table = new Table<TestEntity>
+            {
+                Title = "Title",
+                Columns =
+                {
+                    new Column<TestEntity>("Id", c => c.Id.ToString()),
+                    new Column<TestEntity>("Value", c => c.Value)
+                }
+            };
+
+            TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
+
+            // Act
+            testWriter.Draw(table, testData);
+
+            // Assert
+            var result = this.Writer.ToString();
+            result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(8, "Draw should generate the correct number of lines.");
+
+            lines[0].Should().Be("┌──────────────────────┐");
+            lines[1].Should().Be("│        Title         │");
+            lines[2].Should().Be("├────┬─────────────────┤");
+            lines[3].Should().Be("│ Id │ Value           │");
+            lines[4].Should().Be("├────┼─────────────────┤");
+            lines[5].Should().Be("│ 1  │ Short           │");
+            lines[6].Should().Be("│ 2  │ Loooooooooooong │");
+            lines[7].Should().Be("└────┴─────────────────┘");
+        }
+
+        [TestMethod]
+        public void Draw_LongTitle_Success()
+        {
+            // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = "Short" },
+                new TestEntity { Id = 2, Value = "Loooooooooooong" },
+            };
+
+            Table<TestEntity> table = new Table<TestEntity>
+            {
+                Title = "This is a super long title",
+                Columns =
+                {
+                    new Column<TestEntity>("Id", c => c.Id.ToString()),
+                    new Column<TestEntity>("Value", c => c.Value)
+                }
+            };
+
+            TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
+
+            // Act
+            testWriter.Draw(table, testData);
+
+            // Assert
+            var result = this.Writer.ToString();
+            result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(8, "Draw should generate the correct number of lines.");
+
+            lines[0].Should().Be("┌────────────────────────────┐");
+            lines[1].Should().Be("│ This is a super long title │");
+            lines[2].Should().Be("├────┬───────────────────────┤");
+            lines[3].Should().Be("│ Id │ Value                 │");
+            lines[4].Should().Be("├────┼───────────────────────┤");
+            lines[5].Should().Be("│ 1  │ Short                 │");
+            lines[6].Should().Be("│ 2  │ Loooooooooooong       │");
+            lines[7].Should().Be("└────┴───────────────────────┘");
+        }
+
+        [TestMethod]
+        public void Draw_IndexColumn_Success()
+        {
+            // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = "Short" },
+                new TestEntity { Id = 2, Value = "Loooooooooooong" },
+            };
+
+            Table<TestEntity> table = new Table<TestEntity>
+            {
+                Title = "Title",
+                ShowIndexColumn = true,
+                Columns =
+                {
+                    new Column<TestEntity>("Id", c => c.Id.ToString()),
+                    new Column<TestEntity>("Value", c => c.Value)
+                }
+            };
+
+            TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
+
+            // Act
+            testWriter.Draw(table, testData);
+
+            // Assert
+            var result = this.Writer.ToString();
+            result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(8, "Draw should generate the correct number of lines.");
+
+            lines[0].Should().Be("┌──────────────────────────┐");
+            lines[1].Should().Be("│          Title           │");
+            lines[2].Should().Be("├───┬────┬─────────────────┤");
+            lines[3].Should().Be("│   │ Id │ Value           │");
+            lines[4].Should().Be("├───┼────┼─────────────────┤");
+            lines[5].Should().Be("│ 1 │ 1  │ Short           │");
+            lines[6].Should().Be("│ 2 │ 2  │ Loooooooooooong │");
+            lines[7].Should().Be("└───┴────┴─────────────────┘");
         }
     }
 }

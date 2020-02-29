@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NightStand", "NightStand\Ni
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NightStand.Tests", "NightStand.Tests\NightStand.Tests.csproj", "{A26CC66F-2FFD-461D-8FE3-587EC88C0B2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NightStand.App", "NightStand.App\NightStand.App.csproj", "{6204C761-1D5B-4D03-8A33-708EE96C91AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NightStand.App", "NightStand.App\NightStand.App.csproj", "{6204C761-1D5B-4D03-8A33-708EE96C91AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

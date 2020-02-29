@@ -6,8 +6,13 @@
     {
         public Table()
         {
+            this.Title = string.Empty;
             this.Columns = new List<Column<T>>();
         }
+
+        public string Title { get; set; }
+
+        public bool ShowIndexColumn { get; set; }
 
         public IList<Column<T>> Columns { get; }
     }

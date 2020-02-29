@@ -1,19 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Derek Chasse</Authors>
     <Company />
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <Copyright>Derek Chasse</Copyright>
     <PackageProjectUrl>https://github.com/DerekChasse/NightStand</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DerekChasse/NightStand</RepositoryUrl>
     <NoWarn>SA1633, SA1652</NoWarn>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <Description>The library to choose if you need to pretty-print tabluar data in the console.</Description>
     <PackageTags>Pretty-Print Tables Console</PackageTags>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

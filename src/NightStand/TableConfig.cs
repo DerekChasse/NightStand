@@ -31,6 +31,8 @@
 
         public char HorizontalCharacter { get; set; } = '─';
 
+        public string NullCellDefaultValue { get; set; } = string.Empty;
+
         public int CellRightPadding
         {
             get => this.cellRightPadding;

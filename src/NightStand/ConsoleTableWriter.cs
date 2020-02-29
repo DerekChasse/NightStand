@@ -38,9 +38,9 @@
 
         private void TryAdjustConsole()
         {
-            if (this.TableTotalWidth > Console.BufferWidth)
+            if (this.TableMaxWidth > Console.BufferWidth)
             {
-                Console.BufferWidth = this.TableTotalWidth + this.ConsoleResizePadding;
+                Console.BufferWidth = this.TableMaxWidth + this.ConsoleResizePadding;
             }
         }
     }
