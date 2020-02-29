@@ -29,7 +29,13 @@
 
         public override void Draw(Table<T> table, IEnumerable<T> items, TableConfig config)
         {
-            var enumerated = items as T[] ?? items.ToArray();
+            var enumerated = items as List<T> ?? items.ToList();
+
+            if (table.ShowIndexColumn)
+            {
+                table.Columns.Insert(0, new Column<T>(string.Empty, x => (enumerated.IndexOf(x) + 1).ToString()));
+            }
+
 
             this.Initialize(table, enumerated, config);
 
@@ -161,7 +167,7 @@
             this.builder.Append(Environment.NewLine);
         }
 
-        private void Initialize(Table<T> table, T[] enumerated, TableConfig config)
+        private void Initialize(Table<T> table, IEnumerable<T> enumerated, TableConfig config)
         {
             this.columnWidthLookup = table.Columns.ToDictionary(col => col, col => ComputeColumnBaseWidth(col, enumerated, config.NullCellDefaultValue));
 
