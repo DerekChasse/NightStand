@@ -36,7 +36,6 @@
                 table.Columns.Insert(0, new Column<T>(string.Empty, x => (enumerated.IndexOf(x) + 1).ToString()));
             }
 
-
             this.Initialize(table, enumerated, config);
 
             if (!string.IsNullOrEmpty(table.Title))

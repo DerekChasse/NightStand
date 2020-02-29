@@ -56,7 +56,6 @@
             var elapsed = stopwatch.Elapsed;
 
             Console.WriteLine($"Drawing took {elapsed.ToString()}");
-
         }
     }
 }
