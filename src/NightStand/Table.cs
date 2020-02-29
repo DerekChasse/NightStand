@@ -12,6 +12,8 @@
 
         public string Title { get; set; }
 
+        public bool ShowIndexColumn { get; set; }
+
         public IList<Column<T>> Columns { get; }
     }
 }

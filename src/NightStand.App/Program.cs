@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Bogus;
 
     public class Program
@@ -32,6 +33,7 @@
             var table = new Table<Person>
             {
                 Title = "These are people",
+                ShowIndexColumn = true,
                 Columns =
                 {
                     new Column<Person>("Full Name", s => s.FullName),
@@ -42,12 +44,19 @@
                 }
             };
 
-            for (var i = 0; i < 50; i++)
+            for (var i = 0; i < 500; i++)
             {
                 people.Add(new Person());
             }
 
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             table.Draw(people);
+
+            var elapsed = stopwatch.Elapsed;
+
+            Console.WriteLine($"Drawing took {elapsed.ToString()}");
+
         }
     }
 }

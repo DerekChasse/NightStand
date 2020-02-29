@@ -221,7 +221,6 @@
             lines[4].Should().Be("└────┴───────┘");
         }
 
-
         [TestMethod]
         public void Draw_Title_Success()
         {
@@ -304,6 +303,49 @@
             lines[5].Should().Be("│ 1  │ Short                 │");
             lines[6].Should().Be("│ 2  │ Loooooooooooong       │");
             lines[7].Should().Be("└────┴───────────────────────┘");
+        }
+
+        [TestMethod]
+        public void Draw_IndexColumn_Success()
+        {
+            // Arrange
+            List<TestEntity> testData = new List<TestEntity>
+            {
+                new TestEntity { Id = 1, Value = "Short" },
+                new TestEntity { Id = 2, Value = "Loooooooooooong" },
+            };
+
+            Table<TestEntity> table = new Table<TestEntity>
+            {
+                Title = "Title",
+                ShowIndexColumn = true,
+                Columns =
+                {
+                    new Column<TestEntity>("Id", c => c.Id.ToString()),
+                    new Column<TestEntity>("Value", c => c.Value)
+                }
+            };
+
+            TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
+
+            // Act
+            testWriter.Draw(table, testData);
+
+            // Assert
+            var result = this.Writer.ToString();
+            result.Should().NotBeNullOrWhiteSpace("Draw should render the table.");
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            lines.Length.Should().Be(8, "Draw should generate the correct number of lines.");
+
+            lines[0].Should().Be("┌──────────────────────────┐");
+            lines[1].Should().Be("│          Title           │");
+            lines[2].Should().Be("├───┬────┬─────────────────┤");
+            lines[3].Should().Be("│   │ Id │ Value           │");
+            lines[4].Should().Be("├───┼────┼─────────────────┤");
+            lines[5].Should().Be("│ 1 │ 1  │ Short           │");
+            lines[6].Should().Be("│ 2 │ 2  │ Loooooooooooong │");
+            lines[7].Should().Be("└───┴────┴─────────────────┘");
         }
     }
 }
