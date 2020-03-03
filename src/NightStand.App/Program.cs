@@ -1,29 +1,21 @@
-﻿namespace NightStand.App
+﻿// <copyright file="Program.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace NightStand.App
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using Bogus;
 
-    public class Program
+    public static class Program
     {
         public static void Main()
         {
-            bool exit;
+            Test();
 
-            do
-            {
-                Test();
-
-                Console.WriteLine();
-
-                Console.WriteLine("Press ENTER to run test again.");
-
-                Console.WriteLine();
-
-                exit = Console.ReadKey().Key == ConsoleKey.Enter;
-            }
-            while (exit);
+            Console.WriteLine();
         }
 
         private static void Test()
@@ -41,7 +33,7 @@
                     new Column<Person>("Birth Date", s => s.DateOfBirth.ToShortDateString()),
                     new Column<Person>("City", s => s.Address.City),
                     new Column<Person>("State", s => s.Address.State),
-                }
+                },
             };
 
             for (var i = 0; i < 500; i++)

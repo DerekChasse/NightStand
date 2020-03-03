@@ -1,4 +1,8 @@
-﻿namespace NightStand.Tests
+﻿// <copyright file="TableWriterShould.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace NightStand.Tests
 {
     using System;
     using System.Collections.Generic;
@@ -34,8 +38,8 @@
                 Columns =
                 {
                     new Column<TestEntity>("Id", c => c.Id.ToString()),
-                    new Column<TestEntity>("Value", c => c.Value)
-                }
+                    new Column<TestEntity>("Value", c => c.Value),
+                },
             };
 
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
@@ -66,8 +70,8 @@
                 Columns =
                 {
                     new Column<TestEntity>("Id", c => c.Id.ToString()),
-                    new Column<TestEntity>("Value", c => c.Value)
-                }
+                    new Column<TestEntity>("Value", c => c.Value),
+                },
             };
 
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
@@ -105,8 +109,8 @@
                 Columns =
                 {
                     new Column<TestEntity>("Id", c => c.Id.ToString()),
-                    new Column<TestEntity>("Value", c => c.Value)
-                }
+                    new Column<TestEntity>("Value", c => c.Value),
+                },
             };
 
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
@@ -158,8 +162,8 @@
                 Columns =
                 {
                     new Column<TestEntity>("Id", c => c.Id.ToString()),
-                    new Column<TestEntity>("Value", c => c.Value)
-                }
+                    new Column<TestEntity>("Value", c => c.Value),
+                },
             };
 
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
@@ -195,8 +199,8 @@
                 Columns =
                 {
                     new Column<TestEntity>("Id", c => c.Id.ToString()),
-                    new Column<TestEntity>("Value", c => c.Value)
-                }
+                    new Column<TestEntity>("Value", c => c.Value),
+                },
             };
 
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
@@ -237,8 +241,8 @@
                 Columns =
                 {
                     new Column<TestEntity>("Id", c => c.Id.ToString()),
-                    new Column<TestEntity>("Value", c => c.Value)
-                }
+                    new Column<TestEntity>("Value", c => c.Value),
+                },
             };
 
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
@@ -279,8 +283,8 @@
                 Columns =
                 {
                     new Column<TestEntity>("Id", c => c.Id.ToString()),
-                    new Column<TestEntity>("Value", c => c.Value)
-                }
+                    new Column<TestEntity>("Value", c => c.Value),
+                },
             };
 
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);
@@ -322,8 +326,8 @@
                 Columns =
                 {
                     new Column<TestEntity>("Id", c => c.Id.ToString()),
-                    new Column<TestEntity>("Value", c => c.Value)
-                }
+                    new Column<TestEntity>("Value", c => c.Value),
+                },
             };
 
             TestWriter<TestEntity> testWriter = new TestWriter<TestEntity>(this.Writer);

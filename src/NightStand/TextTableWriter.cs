@@ -6,7 +6,11 @@
     using System.Linq;
     using System.Text;
 
-    public abstract class TextTableWriter<T> : TableWriter<T>
+    /// <summary>
+    /// Implementation of <see cref="ITableWriter{T}"/> which renders to text.
+    /// </summary>
+    /// <typeparam name="T">The type of item being rendered.</typeparam>
+    public abstract class TextTableWriter<T> : ITableWriter<T>
     {
         private readonly TextWriter writer;
         private readonly StringBuilder builder;
@@ -14,20 +18,29 @@
         private IDictionary<Column<T>, int> columnWidthLookup;
         private IDictionary<Column<T>, int> paddedColumnWidthLookup;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TextTableWriter{T}"/> class.
+        /// </summary>
+        /// <param name="writer">a <see cref="TextWriter"/> instance which the table writer will write to.</param>
         protected TextTableWriter(TextWriter writer)
         {
             this.writer = writer;
             this.builder = new StringBuilder();
         }
 
+        /// <summary>
+        /// Gets the tables max width.
+        /// </summary>
         public int TableMaxWidth { get; private set; }
 
-        public override void Draw(Table<T> table, IEnumerable<T> items)
+        /// <inheritdoc />
+        public void Draw(Table<T> table, IEnumerable<T> items)
         {
             this.Draw(table, items, TableConfig.Default);
         }
 
-        public override void Draw(Table<T> table, IEnumerable<T> items, TableConfig config)
+        /// <inheritdoc />
+        public void Draw(Table<T> table, IEnumerable<T> items, TableConfig config)
         {
             var enumerated = items as List<T> ?? items.ToList();
 
@@ -37,6 +50,8 @@
             }
 
             this.Initialize(table, enumerated, config);
+
+            this.PostInitialize();
 
             if (!string.IsNullOrEmpty(table.Title))
             {
@@ -77,6 +92,13 @@
             this.DrawFooter(table, config);
 
             this.writer.WriteLine(this.builder);
+        }
+
+        /// <summary>
+        /// Runs custom logic post initialization.  Values relevant to rendering the table have been computed at this point.
+        /// </summary>
+        protected virtual void PostInitialize()
+        {
         }
 
         private static int ComputeColumnBaseWidth(Column<T> column, IEnumerable<T> items, string nullCellValue)

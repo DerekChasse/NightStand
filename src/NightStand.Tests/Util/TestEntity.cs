@@ -1,4 +1,8 @@
-﻿namespace NightStand.Tests.Util
+﻿// <copyright file="TestEntity.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+namespace NightStand.Tests.Util
 {
     internal class TestEntity
     {
