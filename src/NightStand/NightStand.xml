@@ -1,0 +1,303 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NightStand</name>
+    </assembly>
+    <members>
+        <member name="T:NightStand.Column`1">
+            <summary>
+            Describes a column within a table.
+            </summary>
+            <typeparam name="T">The type of item being rendered.</typeparam>
+        </member>
+        <member name="M:NightStand.Column`1.#ctor(System.String,System.Func{`0,System.String})">
+            <summary>
+            Initializes a new instance of the <see cref="T:NightStand.Column`1"/> class.
+            The column has <see cref="F:NightStand.ColumnAlignment.Left"/> by default.
+            </summary>
+            <param name="header">Value to be rendered at the top of the column.</param>
+            <param name="valueSelector">Method which evaluates a string value for instances of <typeparamref name="T"/>.</param>
+        </member>
+        <member name="M:NightStand.Column`1.#ctor(System.String,NightStand.ColumnAlignment,System.Func{`0,System.String})">
+            <summary>
+            Initializes a new instance of the <see cref="T:NightStand.Column`1"/> class.
+            </summary>
+            <param name="header">Value to be rendered at the top of the column.</param>
+            <param name="alignment">Value indicating how the data should be aligned within the column.</param>
+            <param name="valueSelector">Method which evaluates a string value for instances of <typeparamref name="T"/>.</param>
+        </member>
+        <member name="P:NightStand.Column`1.Header">
+            <summary>
+            Gets the string value rendered at the top of the column.
+            </summary>
+        </member>
+        <member name="P:NightStand.Column`1.Alignment">
+            <summary>
+            Gets the alignment value for data within the column.
+            </summary>
+        </member>
+        <member name="P:NightStand.Column`1.ValueSelector">
+            <summary>
+            Gets the method which evaluates the columns display value for instances of <typeparamref name="T"/>.
+            </summary>
+        </member>
+        <member name="T:NightStand.ColumnAlignment">
+            <summary>
+            Cell content alignment options.
+            </summary>
+        </member>
+        <member name="F:NightStand.ColumnAlignment.Left">
+            <summary>
+            Content will be left aligned within the cell.
+            </summary>
+        </member>
+        <member name="F:NightStand.ColumnAlignment.Right">
+            <summary>
+            Content will be right aligned within the cell.
+            </summary>
+        </member>
+        <member name="F:NightStand.ColumnAlignment.Center">
+            <summary>
+            Content will be centered within the cell.
+            </summary>
+        </member>
+        <member name="T:NightStand.ConsoleTableWriter`1">
+            <summary>
+            Text based table writer which writes to the system console.
+            </summary>
+            <typeparam name="T">The type of item being drawn.</typeparam>
+        </member>
+        <member name="M:NightStand.ConsoleTableWriter`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NightStand.ConsoleTableWriter`1"/> class.
+            </summary>
+        </member>
+        <member name="M:NightStand.ConsoleTableWriter`1.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NightStand.ConsoleTableWriter`1"/> class.
+            </summary>
+            <param name="resizeConsole">Attempt to resize the console buffer if necessary.</param>
+        </member>
+        <member name="M:NightStand.ConsoleTableWriter`1.#ctor(System.Boolean,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NightStand.ConsoleTableWriter`1"/> class.
+            </summary>
+            <param name="resizeConsole">Attempt to resize the console buffer if necessary.</param>
+            <param name="consoleResizePadding">Additional padding to apply to the buffer on resize.</param>
+        </member>
+        <member name="P:NightStand.ConsoleTableWriter`1.ResizeConsole">
+            <summary>
+            Gets or sets a value indicating whether the console buffer should update
+            when table widths are greater than the current buffer. <see langword="true"/> by default.
+            </summary>
+        </member>
+        <member name="P:NightStand.ConsoleTableWriter`1.ConsoleResizePadding">
+            <summary>
+            Gets or sets a value indicating additional padding to apply the the console buffer on resize.
+            5 by default.
+            </summary>
+        </member>
+        <member name="M:NightStand.ConsoleTableWriter`1.PostInitialize">
+            <inheritdoc />
+        </member>
+        <member name="T:NightStand.EnumerableExtensions">
+            <summary>
+            Extension methods for <see cref="T:System.Collections.Generic.IEnumerable`1"/> which aide table drawing.
+            </summary>
+        </member>
+        <member name="M:NightStand.EnumerableExtensions.Draw``1(System.Collections.Generic.IEnumerable{``0},NightStand.Table{``0})">
+            <summary>
+            Draws a collection of items in a table to the console.
+            </summary>
+            <typeparam name="T">The type of item to draw.</typeparam>
+            <param name="items">The collection of items to draw.</param>
+            <param name="table">The configured table in which to draw the items.</param>
+        </member>
+        <member name="M:NightStand.EnumerableExtensions.DrawWith``1(System.Collections.Generic.IEnumerable{``0},NightStand.ITableWriter{``0},NightStand.Table{``0})">
+            <summary>
+            Draws a collection of items in a table using the specified <see cref="T:NightStand.ITableWriter`1"/>.
+            </summary>
+            <typeparam name="T">The type of item to draw.</typeparam>
+            <param name="items">The collection of items to draw.</param>
+            <param name="writer">The <see cref="T:NightStand.ITableWriter`1"/> instance responsible for drawing the table.</param>
+            <param name="table">The configued table in which to draw the items.</param>
+        </member>
+        <member name="T:NightStand.ITableWriter`1">
+            <summary>
+            Provides a machanism for drawing tables.
+            </summary>
+            <typeparam name="T">The type being drawn by the table.</typeparam>
+        </member>
+        <member name="M:NightStand.ITableWriter`1.Draw(NightStand.Table{`0},System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Draws a table with the default <see cref="T:NightStand.TableConfig"/>.
+            </summary>
+            <param name="table">The table to draw.</param>
+            <param name="items">Values to draw within the table.</param>
+        </member>
+        <member name="M:NightStand.ITableWriter`1.Draw(NightStand.Table{`0},System.Collections.Generic.IEnumerable{`0},NightStand.TableConfig)">
+            <summary>
+            Draws a table with the default <see cref="T:NightStand.TableConfig"/>.
+            </summary>
+            <param name="table">The table to draw.</param>
+            <param name="items">Values to draw within the table.</param>
+            <param name="config">Configuration object for the table.</param>
+        </member>
+        <member name="T:NightStand.Table`1">
+            <summary>
+            Describes how a collection of items are to be rendered in a tabular format.
+            </summary>
+            <typeparam name="T">The type of item to be rendered.</typeparam>
+        </member>
+        <member name="M:NightStand.Table`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NightStand.Table`1"/> class.
+            </summary>
+        </member>
+        <member name="P:NightStand.Table`1.Title">
+            <summary>
+            Gets or sets the title of the table.
+            </summary>
+        </member>
+        <member name="P:NightStand.Table`1.ShowIndexColumn">
+            <summary>
+            Gets or sets a value indicating whether the index column should be rendered.
+            </summary>
+        </member>
+        <member name="P:NightStand.Table`1.Columns">
+            <summary>
+            Gets a collection of <see cref="T:NightStand.Column`1"/> which will be rendered as part of the table.
+            </summary>
+        </member>
+        <member name="T:NightStand.TableConfig">
+            <summary>
+            Table customization class.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.Default">
+            <summary>
+            Gets an instance of the default table rendering settings.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.TopLeftCharacter">
+            <summary>
+            Gets or sets the character to use for the top-left corner.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.TopRightCharacter">
+            <summary>
+            Gets or sets the character to use for the top-right corner.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.BottomLeftCharacter">
+            <summary>
+            Gets or sets the character to use for the bottom-left corner.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.BottomRightCharacter">
+            <summary>
+            Gets or sets the character to use for the bottom-right corner.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.HorizontalTopJointCharacter">
+            <summary>
+            Gets or sets the character to use for the horizontal top joint.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.HorizontalBottomJointCharacter">
+            <summary>
+            Gets or sets the character to use for the horizontal bottom joint.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.IntersectionJointCharacter">
+            <summary>
+            Gets or sets the character to use for the intersection joint..
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.VerticalCharacter">
+            <summary>
+            Gets or sets the character to use for a standard vertical line.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.VerticalLeftJointCharacter">
+            <summary>
+            Gets or sets the character to use for the vertical left joint.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.VerticalRightJointCharacter">
+            <summary>
+            Gets or sets the character to use for the vertical right joint.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.HorizontalCharacter">
+            <summary>
+            Gets or sets the character to use for a standard horizontal line.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.NullCellDefaultValue">
+            <summary>
+            Gets or sets the string to use if a cell evaluates to <see langword="null"/>. The value is <see cref="F:System.String.Empty"/> by default.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.CellRightPadding">
+            <summary>
+            Gets or sets the number of spaces to pad the right side of a column. The value is 1 by default.
+            </summary>
+        </member>
+        <member name="P:NightStand.TableConfig.CellLeftPadding">
+            <summary>
+            Gets or sets the number of spaces to pad the left side of a column. The value is 1 by default.
+            </summary>
+        </member>
+        <member name="T:NightStand.TableExtensions">
+            <summary>
+            Extension methods for <see cref="T:NightStand.Table`1"/> which aide table drawing.
+            </summary>
+        </member>
+        <member name="M:NightStand.TableExtensions.Draw``1(NightStand.Table{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Draws a collection of items in a table to the console.
+            </summary>
+            <typeparam name="T">The type of item to draw.</typeparam>
+            <param name="table">The configured table in which to draw the items.</param>
+            <param name="items">The collection of items to draw.</param>
+        </member>
+        <member name="M:NightStand.TableExtensions.DrawWith``1(NightStand.Table{``0},NightStand.ITableWriter{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Draws a collection of items in a table using the specified <see cref="T:NightStand.ITableWriter`1"/>.
+            </summary>
+            <typeparam name="T">The type of item to draw.</typeparam>
+            <param name="table">The configured table in which to draw the items.</param>
+            <param name="writer">The <see cref="T:NightStand.ITableWriter`1"/> instance responsible for drawing the table.</param>
+            <param name="items">The collection of items to draw.</param>
+        </member>
+        <member name="T:NightStand.TextTableWriter`1">
+            <summary>
+            Implementation of <see cref="T:NightStand.ITableWriter`1"/> which renders to text.
+            </summary>
+            <typeparam name="T">The type of item being rendered.</typeparam>
+        </member>
+        <member name="M:NightStand.TextTableWriter`1.#ctor(System.IO.TextWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NightStand.TextTableWriter`1"/> class.
+            </summary>
+            <param name="writer">a <see cref="T:System.IO.TextWriter"/> instance which the table writer will write to.</param>
+        </member>
+        <member name="P:NightStand.TextTableWriter`1.TableMaxWidth">
+            <summary>
+            Gets the tables max width.
+            </summary>
+        </member>
+        <member name="M:NightStand.TextTableWriter`1.Draw(NightStand.Table{`0},System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:NightStand.TextTableWriter`1.Draw(NightStand.Table{`0},System.Collections.Generic.IEnumerable{`0},NightStand.TableConfig)">
+            <inheritdoc />
+        </member>
+        <member name="M:NightStand.TextTableWriter`1.PostInitialize">
+            <summary>
+            Runs custom logic post initialization.  Values relevant to rendering the table have been computed at this point.
+            </summary>
+        </member>
+    </members>
+</doc>
