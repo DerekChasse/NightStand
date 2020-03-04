@@ -18,7 +18,7 @@ As an example lets imagine that we want to print some information derived from `
 
 
 ```csharp
-var table = new Table<Person>
+var peopleTable = new Table<Person>
 {
     Columns =
     {
@@ -42,7 +42,7 @@ var people = new List<Person>();
 
 ConsoleTableWriter<Person> consoleWriter = new ConsoleTableWriter<Person>();
 
-consoleWriter.Draw(table: cultureTable, items: people);
+consoleWriter.Draw(table: peopleTable, items: people);
 ```
 
 

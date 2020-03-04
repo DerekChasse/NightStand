@@ -24,8 +24,7 @@ namespace NightStand.App
 
             var table = new Table<Person>
             {
-                Title = "These are people",
-                ShowIndexColumn = true,
+                Title = "Active Employees",
                 Columns =
                 {
                     new Column<Person>("Full Name", s => s.FullName),
@@ -36,7 +35,7 @@ namespace NightStand.App
                 },
             };
 
-            for (var i = 0; i < 500; i++)
+            for (var i = 0; i < 10; i++)
             {
                 people.Add(new Person());
             }
